@@ -35,13 +35,19 @@ jobs:
         if: runner.os == 'Linux'
         uses: ./.github/actions/linux-deps
 
+      # bash on every runner, including Windows: PowerShell splits an
+      # argument such as -coverprofile=coverage.out at the dot and go then
+      # looks for a package called ".out".
       - name: Build
+        shell: bash
         run: go build ./...
 
       - name: Vet
+        shell: bash
         run: go vet ./...
 
       - name: Test
+        shell: bash
         run: go test -race -covermode=atomic -coverprofile=coverage.out ./...
 
       - name: Upload coverage
@@ -94,6 +100,7 @@ jobs:
       - name: Build and test against the newest Fyne
         run: |
           go get fyne.io/fyne/v2@latest
+          go mod tidy # a newer Fyne can pull in modules go.sum does not cover
           go build ./...
           go test ./...
 
