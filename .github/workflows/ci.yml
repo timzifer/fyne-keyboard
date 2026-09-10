@@ -22,9 +22,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version: stable
           check-latest: true
@@ -33,11 +33,7 @@ jobs:
       # the demo command links against.
       - name: Install Linux build dependencies
         if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            gcc libgl1-mesa-dev libxi-dev libxcursor-dev libxrandr-dev \
-            libxinerama-dev libxkbcommon-dev xorg-dev
+        uses: ./.github/actions/linux-deps
 
       - name: Build
         run: go build ./...
@@ -50,28 +46,70 @@ jobs:
 
       - name: Upload coverage
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: coverage.out
 
-  lint:
-    name: lint
+  minimum-versions:
+    name: minimum supported versions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-go@v5
+      # go.mod names both floors: the go directive is the oldest toolchain and
+      # the fyne.io/fyne/v2 requirement the oldest Fyne we support. Building
+      # with exactly those catches an accidental use of a newer API.
+      - id: floor
+        run: echo "go=$(go mod edit -json | jq -r .Go)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ steps.floor.outputs.go }}
+
+      - name: Install Linux build dependencies
+        uses: ./.github/actions/linux-deps
+
+      - name: Build and test
+        run: |
+          go build ./...
+          go test ./...
+
+  latest-fyne:
+    name: latest Fyne
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
         with:
           go-version: stable
           check-latest: true
 
       - name: Install Linux build dependencies
+        uses: ./.github/actions/linux-deps
+
+      # go.mod names the minimum, so without this nothing would ever be built
+      # against a newer Fyne than the floor.
+      - name: Build and test against the newest Fyne
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            gcc libgl1-mesa-dev libxi-dev libxcursor-dev libxrandr-dev \
-            libxinerama-dev libxkbcommon-dev xorg-dev
+          go get fyne.io/fyne/v2@latest
+          go build ./...
+          go test ./...
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+          check-latest: true
+
+      - name: Install Linux build dependencies
+        uses: ./.github/actions/linux-deps
 
       - name: gofmt
         run: |
@@ -87,6 +125,6 @@ jobs:
           go mod tidy
           git diff --exit-code -- go.mod go.sum
 
-      - uses: golangci/golangci-lint-action@v6
+      - uses: golangci/golangci-lint-action@v9
         with:
           version: latest

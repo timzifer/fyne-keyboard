@@ -134,7 +134,10 @@ widget it was opened for instead of following the focus.
 
 ## Requirements
 
-Go 1.24+ and Fyne v2.8. Desktop and touch, no external dependencies.
+Go 1.22+ and Fyne v2.6+ — the newest API in use is `fyne.Do`, added in 2.6.
+Newer Fyne releases work as well; CI builds against both the floor named in
+`go.mod` and the latest release. Desktop and touch, no dependencies beyond
+Fyne.
 
 ## Contributing
 

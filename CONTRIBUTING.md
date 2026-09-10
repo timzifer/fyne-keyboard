@@ -22,7 +22,10 @@ demo; see the [Fyne getting started guide](https://docs.fyne.io/started/).
 - `go test ./...` passes, and new behaviour comes with a test
 - exported identifiers have doc comments that say *why*, not just *what*
 
-CI runs the same checks on Linux, macOS and Windows, plus `golangci-lint`.
+CI runs the same checks on Linux, macOS and Windows, plus `golangci-lint`, and
+builds against both the minimum versions named in `go.mod` (Go 1.22, Fyne
+v2.6) and the latest Fyne release. Please do not raise either floor without a
+reason — say which API needs it in the pull request.
 
 ## Adding a layout
 
