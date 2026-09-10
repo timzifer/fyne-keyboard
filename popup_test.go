@@ -2,6 +2,7 @@ package keyboard
 
 import (
 	"testing"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -148,7 +149,9 @@ func TestPopupAutoShow(t *testing.T) {
 	t.Cleanup(win.Close)
 
 	p := NewPopup(win, WithAutoShow(true))
-	t.Cleanup(p.StopAutoShow)
+	// See the decorator test: the test driver runs fyne.Do inline, so the
+	// poller is stopped and followFocus called directly.
+	p.StopAutoShow()
 
 	win.Canvas().Focus(entry)
 	p.followFocus()
@@ -162,6 +165,25 @@ func TestPopupAutoShow(t *testing.T) {
 	if !p.Visible() {
 		t.Error("the popup closed itself while open")
 	}
+}
+
+func TestPopupAutoShowPollerStartsAndStops(t *testing.T) {
+	test.NewApp()
+	t.Cleanup(func() { test.NewApp() })
+
+	win := test.NewWindow(widget.NewEntry())
+	t.Cleanup(win.Close)
+
+	p := NewPopup(win, WithAutoShow(true), WithAutoShowInterval(time.Hour))
+	if p.stopPoll == nil {
+		t.Fatal("WithAutoShow should have started the poller")
+	}
+	p.startAutoShow()
+	p.StopAutoShow()
+	if p.stopPoll != nil {
+		t.Error("StopAutoShow should have cleared the poller")
+	}
+	p.StopAutoShow()
 }
 
 func TestPopupWithoutWindowIsInert(t *testing.T) {

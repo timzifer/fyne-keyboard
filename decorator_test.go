@@ -2,6 +2,7 @@ package keyboard
 
 import (
 	"testing"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -145,7 +146,11 @@ func TestDecoratorAutoShowFollowsTextInput(t *testing.T) {
 	win, entry := newTestWindow(t)
 	d := NewDecorator(win, entry, WithAutoShow(true))
 	win.SetContent(d.Content())
-	t.Cleanup(d.StopAutoShow)
+	// Stop the poller and drive followFocus by hand: under the test driver
+	// fyne.Do runs on the calling goroutine instead of queueing onto the main
+	// thread, so a live ticker would touch the canvas concurrently with the
+	// test itself.
+	d.StopAutoShow()
 
 	win.Canvas().Focus(entry)
 	d.followFocus()
@@ -166,6 +171,23 @@ func TestDecoratorAutoShowFollowsTextInput(t *testing.T) {
 	if d.Visible() {
 		t.Error("focusing a non text widget should hide the keyboard")
 	}
+}
+
+func TestDecoratorAutoShowPollerStartsAndStops(t *testing.T) {
+	win, entry := newTestWindow(t)
+	// An interval no test will ever reach: this checks the lifecycle of the
+	// polling goroutine, not what it does.
+	d := NewDecorator(win, entry, WithAutoShow(true), WithAutoShowInterval(time.Hour))
+
+	if d.stopPoll == nil {
+		t.Fatal("WithAutoShow should have started the poller")
+	}
+	d.startAutoShow() // a second call must not start a second goroutine
+	d.StopAutoShow()
+	if d.stopPoll != nil {
+		t.Error("StopAutoShow should have cleared the poller")
+	}
+	d.StopAutoShow() // stopping twice is harmless
 }
 
 func TestDecoratorWithoutWindow(t *testing.T) {
