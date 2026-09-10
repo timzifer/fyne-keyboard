@@ -1,12 +1,15 @@
 name: Linux build dependencies
-description: Installs the OpenGL and X11 headers that Fyne's GLFW driver needs.
+description: Installs the OpenGL, X11 and Wayland headers that Fyne's GLFW driver needs.
 
 runs:
   using: composite
   steps:
+    # Fyne 2.8 moved to GLFW 3.4, which compiles its Wayland backend as well as
+    # the X11 one, so the Wayland headers are needed even for an X11 only run.
     - shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends \
           gcc libgl1-mesa-dev libxi-dev libxcursor-dev libxrandr-dev \
-          libxinerama-dev libxkbcommon-dev xorg-dev
+          libxinerama-dev libxkbcommon-dev xorg-dev \
+          libwayland-dev wayland-protocols libdecor-0-dev
