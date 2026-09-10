@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Fyne documentation
+    url: https://docs.fyne.io/
+    about: Questions about Fyne itself are better asked upstream.

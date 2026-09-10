@@ -1,0 +1,34 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you expected, and what happened instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: A small program is worth a hundred words.
+      render: go
+    validations:
+      required: true
+
+  - type: input
+    id: layout
+    attributes:
+      label: Layout
+      placeholder: de-DE, numpad, own layout ...
+
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Output of `go version`, the Fyne version and the operating system.
+    validations:
+      required: true

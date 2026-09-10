@@ -1,0 +1,25 @@
+name: Layout request
+description: Ask for a keyboard layout for another language
+labels: [layout]
+body:
+  - type: input
+    id: tag
+    attributes:
+      label: Language tag
+      placeholder: es-ES
+    validations:
+      required: true
+
+  - type: textarea
+    id: rows
+    attributes:
+      label: The rows
+      description: The characters per row, base level, and the shift and AltGr levels if they differ.
+    validations:
+      required: true
+
+  - type: textarea
+    id: dead
+    attributes:
+      label: Dead keys
+      description: Which diacritics exist and what they combine into.
