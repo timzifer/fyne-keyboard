@@ -2,7 +2,6 @@
 
 [![CI](https://github.com/timzifer/fyne-keyboard/actions/workflows/ci.yml/badge.svg)](https://github.com/timzifer/fyne-keyboard/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/timzifer/fyne-keyboard.svg)](https://pkg.go.dev/github.com/timzifer/fyne-keyboard)
-[![Go Report Card](https://goreportcard.com/badge/github.com/timzifer/fyne-keyboard)](https://goreportcard.com/report/github.com/timzifer/fyne-keyboard)
 
 An on screen keyboard for [Fyne](https://fyne.io) applications — for desktops
 without a hardware keyboard, touch panels and kiosks.
